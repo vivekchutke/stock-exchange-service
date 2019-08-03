@@ -1,5 +1,6 @@
 package com.vivekchutke.stock.exchange.stockexchangeservice.controller;
 
+import com.vivekchutke.stock.exchange.stockexchangeservice.model.BookQuote;
 import com.vivekchutke.stock.exchange.stockexchangeservice.model.OpenHighLowClose;
 import com.vivekchutke.stock.exchange.stockexchangeservice.stockexchangeproxy.StockExchangeProxy;
 import org.slf4j.Logger;
@@ -11,16 +12,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@Configuration
+@Component
 public class StockExchangeController {
 
     Logger logger = LoggerFactory.getLogger(StockExchangeController.class);
@@ -41,7 +41,6 @@ public class StockExchangeController {
 
     @GetMapping("/ohlc/{stockCode}")
     public OpenHighLowClose getOHLC(@PathVariable String stockCode) {
-
         logger.info("In getOHLC Method with stock code"+stockCode);
         Map<String, String> uriVariables = new HashMap<String, String>();
         uriVariables.put("stockCode", stockCode);
@@ -52,33 +51,42 @@ public class StockExchangeController {
         ResponseEntity<OpenHighLowClose> responseEntity = new RestTemplate().exchange("https://investors-exchange-iex-trading.p.rapidapi.com/stock/{stockCode}/ohlc",
                 HttpMethod.GET, getHeaderEntity(), OpenHighLowClose.class, uriVariables);
 
-
         System.out.println("Response Entity is: "+responseEntity.getBody());
-
         return responseEntity.getBody();
-
     }
 
     @GetMapping("/ohlc-feign/{stockCode}")
     public OpenHighLowClose getOHLCThroughFeign(@PathVariable String stockCode) {
         logger.info("***********In getOHLCThroughFeign Method with stock code" + stockCode);
 
-        String headerValue1="investors-exchange-iex-trading.p.rapidapi.com";
-        String headerValue2="6ed3ce8a0bmsh355823103be907cp1c8806jsnc31bc96c5dce";
+//        String headerValue1="investors-exchange-iex-trading.p.rapidapi.com";
+//        String headerValue2="6ed3ce8a0bmsh355823103be907cp1c8806jsnc31bc96c5dce";
 
-        OpenHighLowClose openHighLowClose = stockExchangeProxy.retrieveOHLC(stockCode, headerValue1, headerValue2);
+        OpenHighLowClose openHighLowClose = stockExchangeProxy.retrieveOHLC(stockCode, this.xRapidAPIHost, this.xRapidAPIKey);
         System.out.println("Response Object is****: "+openHighLowClose);
 
         return openHighLowClose;
     }
 
+    @RequestMapping(value = "/stock/{stockCode}/book", method = RequestMethod.GET)
+    public BookQuote getBookQuote(@PathVariable String stockCode) {
+        logger.info("*******In getBookQuote Method with stock code"+stockCode);
+        Map<String, String> uriVariables = new HashMap<String, String>();
+        uriVariables.put("stockCode", stockCode);
+        ResponseEntity<BookQuote> responseEntity = new RestTemplate().exchange("https://investors-exchange-iex-trading.p.rapidapi.com/stock/{stockCode}/book",
+                HttpMethod.GET, this.getHeaderEntity(), BookQuote.class, uriVariables);
+        System.out.println("Printing ResponseBody:" +responseEntity.getBody());
 
-    private static HttpEntity<String> getHeaderEntity() {
+        return responseEntity.getBody();
+
+    }
+
+
+    private  HttpEntity<String> getHeaderEntity() {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("X-RapidAPI-Host", "investors-exchange-iex-trading.p.rapidapi.com");
-        httpHeaders.add("X-RapidAPI-Key", "6ed3ce8a0bmsh355823103be907cp1c8806jsnc31bc96c5dce");
+        httpHeaders.add("X-RapidAPI-Host", this.xRapidAPIHost);
+        httpHeaders.add("X-RapidAPI-Key", this.xRapidAPIKey);
 
         return new HttpEntity<String>(httpHeaders);
     }
-
 }
