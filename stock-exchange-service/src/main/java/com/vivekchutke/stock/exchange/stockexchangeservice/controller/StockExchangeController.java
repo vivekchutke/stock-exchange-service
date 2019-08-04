@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -33,6 +34,10 @@ public class StockExchangeController {
 
     @Autowired
     private StockExchangeProxy stockExchangeProxy;
+
+    @Autowired
+    private Environment environment;
+
 
     @GetMapping("/say")
     public String sayHello() {
@@ -70,17 +75,24 @@ public class StockExchangeController {
 
     @RequestMapping(value = "/stock/{stockCode}/book", method = RequestMethod.GET)
     public BookQuote getBookQuote(@PathVariable String stockCode) {
-        logger.info("*******In getBookQuote Method with stock code"+stockCode);
+        logger.info("*******In getBookQuote Method with stock code: "+stockCode);
         Map<String, String> uriVariables = new HashMap<String, String>();
         uriVariables.put("stockCode", stockCode);
         ResponseEntity<BookQuote> responseEntity = new RestTemplate().exchange("https://investors-exchange-iex-trading.p.rapidapi.com/stock/{stockCode}/book",
                 HttpMethod.GET, this.getHeaderEntity(), BookQuote.class, uriVariables);
         System.out.println("Printing ResponseBody:" +responseEntity.getBody());
 
-        return responseEntity.getBody();
-
+        BookQuote bookQuote = responseEntity.getBody();
+        String port = environment.getProperty("local.server.port");
+//        logger.info("******* Port Value is: "+port);
+//        logger.info("*******environmen values:"+environment.getProperty("spring.security.user.name"));
+//        logger.info("*******environmen values:"+environment.getProperty("spring.security.user.name"));
+//        logger.info("*******VCAP_APPLICATION.application_id values:"+environment.getProperty("VCAP_APPLICATION.application_id"));
+//        logger.info("*******VCAP_APPLICATION values:"+environment.getProperty("VCAP_APPLICATION"));
+//        logger.info("*******EnvVarKey values:"+environment.getProperty("EnvVarKey"));
+        bookQuote.setPort(port);
+        return bookQuote;
     }
-
 
     private  HttpEntity<String> getHeaderEntity() {
         HttpHeaders httpHeaders = new HttpHeaders();

@@ -12,3 +12,7 @@ env:
   spring.security.user.name: ${vcap.services.my-cfcups-service.credentials.username}
   spring.security.user.password: ${vcap.services.my-cfcups-service.credentials.password}
   SPRING_PROFILES_ACTIVE: qa
+
+## This does not seem to work
+server:
+  port: 8800

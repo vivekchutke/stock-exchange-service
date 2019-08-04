@@ -38,6 +38,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	compile group: 'io.pivotal.spring.cloud', name: 'spring-cloud-services-starter-config-client', version: '2.1.4.RELEASE'
+	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+
 }
 
 dependencyManagement {

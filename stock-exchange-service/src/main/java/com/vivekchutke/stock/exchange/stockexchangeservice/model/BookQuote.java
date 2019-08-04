@@ -4,6 +4,8 @@ import java.util.List;
 
 public class BookQuote {
 
+    private String port;
+
     private Quote quote;
 
     private SystemEvent systemEvent;
@@ -13,6 +15,14 @@ public class BookQuote {
     private List<Asks> asks;
 
     private List<Bids> bids;
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
 
     public Quote getQuote() {
         return quote;
