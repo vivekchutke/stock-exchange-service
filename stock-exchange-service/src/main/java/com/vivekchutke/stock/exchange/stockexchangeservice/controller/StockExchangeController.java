@@ -98,6 +98,8 @@ public class StockExchangeController {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("X-RapidAPI-Host", this.xRapidAPIHost);
         httpHeaders.add("X-RapidAPI-Key", this.xRapidAPIKey);
+        logger.info("Header Key X-RapidAPI-Host is :"+this.xRapidAPIHost);
+        logger.info("Header Key X-RapidAPI-Key is :"+this.xRapidAPIKey);
 
         return new HttpEntity<String>(httpHeaders);
     }
